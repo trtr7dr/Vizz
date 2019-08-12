@@ -11,6 +11,7 @@ Vizz — класс для визуализации различных пото�
 * mode_4, def — https://gloagent.ru/vizz7
 * mode_4, big + glitch — https://gloagent.ru/vizz8
 * mode_4 + invert glitch — https://gloagent.ru/vizz10
+* mode_5 — https://gloagent.ru/vizz11
 ## Параметры
 ```javascript
 new Vizz(element_id, color, bg_color); //id элемента для канваса, цвет внутренностей, цвет фона для обратных помех
