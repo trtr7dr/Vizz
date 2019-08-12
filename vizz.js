@@ -472,6 +472,51 @@ class Vizz {
             }
         }
     }
+    
+    /**
+     * Режим 5.
+     * Круг
+     *
+     * @param {object} d
+     * @param {number} h - ширина линии
+     * @param {boolean} norm - нормализация. True: поток нормализуется исходя из размеров экрана.
+     * @param {number} ref - обновление. Если есть, то очищает канвас только на rel шаге.
+     * @param {Array} color - цвета. 0 - предел для низкого значения, 1 - предел для среднего. 2 - предел самого громкого
+     */
+    mode_5(d, h, norm, ref, color) {
+
+        if (h === undefined)
+            h = 10;
+        if (ref) {
+            if (this.refresh > ref) {
+                this.ctx.clearRect(0, 0, this.w, this.h);
+                this.refresh = 0;
+            } else {
+                this.refresh += 1;
+            }
+        } else {
+            this.ctx.clearRect(0, 0, this.w, this.h);
+        }
+        this.ctx.fillStyle = this.color;
+        this.ctx.strokeStyle = this.color;
+        if (norm)
+            d = this.data_norm(d, this.h);
+
+        for (var k = 0; k < d.length; k++) {
+            if (color) {
+                if (d[k] > color[2]) {
+                    this.ctx.strokeStyle = "red";
+                } else if (d[k] > color[1]) {
+                    this.ctx.strokeStyle = "blue";
+                } else {
+                    this.ctx.strokeStyle = "green";
+                }
+            }
+            this.ctx.beginPath();
+            this.ctx.arc(this.w/2, this.h/2, d[k], 0, 2 * Math.PI);
+            this.ctx.stroke();
+        }
+    }
 
     /**
      * Помехи.
