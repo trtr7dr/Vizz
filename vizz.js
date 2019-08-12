@@ -1,5 +1,10 @@
-class FChars { // v 0.9
+class FChars {
     constructor(canvas_id) {
+        if (!document.getElementById(canvas_id))
+            console.error('FChars error: element ' + canvas_id + ' not found');
+        else
+            this.id = document.getElementById(canvas_id);
+
         this.res = [];
         this.res['A'] = [0, 0, 1, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 1, 1, 0, 0, 1, 0, 1, 0];
         this.res['B'] = [0, 1, 1, 1, 0, 0, 1, 0, 1, 0, 0, 1, 1, 0, 0, 0, 1, 0, 1, 0, 0, 1, 1, 1, 0];
@@ -109,6 +114,7 @@ class FChars { // v 0.9
      * @param {string} color - цвет букв
      */
     paint_char(c, canvas, w, w_pos, h_pos, color) {
+
         var c_car_w = 0;
         var c_car_h = 0;
 
@@ -124,10 +130,13 @@ class FChars { // v 0.9
                 c_car_w = 0;
             }
         }
+
     }
 }
 
-class Vizz { // v 1.0
+
+
+class Vizz {
 
     randomInteger(min, max) {
         let rand = min + Math.random() * (max + 1 - min);
@@ -139,10 +148,15 @@ class Vizz { // v 1.0
         if (color === undefined)
             color = "#03afcc";
         this.color = color;
+
         if (bg_color === undefined)
             bg_color = "black";
         this.bg_color = bg_color;
+
         this.moment = 0;
+
+        this.refresh = 0;
+
         this.ready();
     }
 
@@ -201,7 +215,7 @@ class Vizz { // v 1.0
         var mode = ['sqr', 'cir', 'tri', 'ser'];
 
         if (this.moment < l) { // режим 1
-            this.mode_1(d, this.randomInteger(1, this.w / 5), this.randomInteger(1, this.h / 10), true, mode[this.randomInteger(0, mode.length) - 1], this.randomInteger(1, this.w / 10));
+            this.mode_1(d, this.randomInteger(1, this.w / 5), this.randomInteger(1, this.h / 10), true, mode[this.randomInteger(0, mode.length)], this.randomInteger(1, this.w / 10));
             this.moment++;
         }
         if (this.moment >= l && this.moment < l * 2) {
@@ -218,6 +232,7 @@ class Vizz { // v 1.0
                 this.mode_4(d, this.randomInteger(1, this.w / 4), this.randomInteger(1, this.w / 10), 'big');
             else
                 this.mode_4(d, this.randomInteger(1, this.w / 4), this.randomInteger(1, this.w / 10));
+
             this.moment++;
         }
         if (this.moment >= l * 4)
@@ -225,6 +240,8 @@ class Vizz { // v 1.0
 
         if (this.randomInteger(0, 1) === 1)
             this.glitch(this.randomInteger(-1, 0));
+
+
     }
 
     /**
@@ -238,6 +255,7 @@ class Vizz { // v 1.0
      * @param {string} type - тип фигуры. По умолчанию: четырехугольник w_elem*h_elem. sqr — прямоугольник. cir — окружность радиуса w_elem и отступом от предыдущего ряда в h_elem. tri — треугольник с шириной w_elem и отступом от предыдущего ряда h_elem. ser — как треугольники, но маленькие линии
      * @param {number} margin - отступы между элементами.
      */
+
     mode_1(d, w_elem, h_elem, mode, type, margin) {
         if (w_elem === undefined)
             w_elem = 5;
@@ -309,6 +327,7 @@ class Vizz { // v 1.0
      * @param {number} wel - ширина элемента. По умолчанию: ширина конваса / число элементов.
      * @param {number} hel - высота элемента. По умолчанию: высота конваса / число элементов.
      */
+
     mode_2(d, wel, hel) {
         if (wel === undefined)
             wel = Math.ceil(this.w / d.length, 1);
@@ -329,6 +348,8 @@ class Vizz { // v 1.0
                     if (d[k] < 0)
                         d[k] += this.h / 2;
                     this.ctx.fillRect(car_w, d[k], wel, hel);
+
+
                     car_w += wel;
                 }
                 i = false;
@@ -351,25 +372,51 @@ class Vizz { // v 1.0
      * @param {object} d
      * @param {number} wel
      * @param {number} h - ширина линии
+     * @param {boolean} norm - нормализация. True: поток нормализуется исходя из размеров экрана.
+     * @param {number} ref - обновление. Если есть, то очищает канвас только на rel шаге.
+     * @param {Array} color - цвета. 0 - предел для низкого значения, 1 - предел для среднего. 2 - предел самого громкого
      */
-    mode_3(d, wel, h) {
+
+    mode_3(d, wel, h, norm, ref, color) {
 
         if (wel === undefined)
             wel = Math.ceil(this.w / d.length, 1);
         if (h === undefined)
             h = 10;
 
-        this.ctx.clearRect(0, 0, this.w, this.h);
+        if (ref) {
+            if (this.refresh > ref) {
+                this.ctx.clearRect(0, 0, this.w, this.h);
+                this.refresh = 0;
+            } else {
+                this.refresh += 1;
+            }
+        } else {
+            this.ctx.clearRect(0, 0, this.w, this.h);
+        }
         var car_w = 1;
         this.ctx.fillStyle = this.color;
         this.ctx.strokeStyle = this.color;
-        d = this.data_norm(d, this.h);
+        if (norm)
+            d = this.data_norm(d, this.h);
         while (car_w < this.w) {
             for (var k = 0; k < d.length; k++) {
+                if (color) {
+                    if (d[k] > color[2]) {
+                        this.ctx.strokeStyle = "red";
+                    } else if (d[k] > color[1]) {
+                        this.ctx.strokeStyle = "blue";
+                    } else {
+                        this.ctx.strokeStyle = "green";
+                    }
+                }
                 this.ctx.beginPath();
                 this.ctx.lineWidth = h;
                 this.ctx.moveTo(car_w, this.h / 2);
                 this.ctx.quadraticCurveTo(car_w + wel / 2, this.h / 2 + d[k], car_w + wel, this.h / 2);
+                this.ctx.stroke();
+                this.ctx.moveTo(car_w, this.h / 2);
+                this.ctx.quadraticCurveTo(car_w + wel / 2, this.h / 2 - d[k], car_w + wel, this.h / 2);
                 this.ctx.stroke();
                 car_w += wel;
             }
@@ -385,6 +432,7 @@ class Vizz { // v 1.0
      * @param {number} margin - отступы между элементами.
      * @param {string} mode - режимы. По умолчанию: вывод всех символов с указанной шириной на всем канвасе. 'big' — первый символ в потоке по центру экрана.
      */
+
     mode_4(d, wel, margin, mode) {
 
         if (wel === undefined)
@@ -393,6 +441,7 @@ class Vizz { // v 1.0
             margin = 5;
 
         this.ctx.clearRect(0, 0, this.w, this.h);
+
         this.ctx.beginPath();
         this.ctx.moveTo(this.w / 2, this.h / 2);
         var car_w = 0;
@@ -403,6 +452,7 @@ class Vizz { // v 1.0
         this.ctx.fillStyle = this.color;
         this.ctx.strokeStyle = this.color;
         while (car_h < this.h) {
+
             for (var k = 0; k < d.length; k++) { //сюда нужен свич с эффектами
                 switch (mode) {
                     case 'big':
@@ -509,7 +559,6 @@ class Vizz { // v 1.0
         this.ctx.lineTo(x + w, y);
         this.ctx.lineTo(x + w, y + h);
 
-        this.ctx.closePath();
         this.ctx.fill();
     }
 }
