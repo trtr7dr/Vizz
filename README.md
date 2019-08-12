@@ -47,8 +47,11 @@ new Vizz(element_id, color, bg_color); //id элемента для канвас
      * Гнутая линия
      *
      * @param {object} d
-     * @param {number} wel - шаг кривой
+     * @param {number} wel
      * @param {number} h - ширина линии
+     * @param {boolean} norm - нормализация. True: поток нормализуется исходя из размеров экрана.
+     * @param {number} ref - обновление. Если есть, то очищает канвас только на rel шаге.
+     * @param {Array} color - цвета. 0 - предел для низкого значения, 1 - предел для среднего. 2 - предел самого громкого
      */
 ```
 ### Mode 4
