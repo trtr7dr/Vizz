@@ -513,7 +513,7 @@ class Vizz {
                 }
             }
             this.ctx.beginPath();
-            this.ctx.arc(this.w/2, this.h/2, d[k], 0, 2 * Math.PI);
+            this.ctx.arc(this.w/2, this.h/2, Math.abs(d[k]), 0, 2 * Math.PI);
             this.ctx.stroke();
         }
     }
