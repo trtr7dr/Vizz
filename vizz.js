@@ -162,12 +162,12 @@ class Vizz {
 
     ready() {
         var canv = document.createElement('canvas');
-        canv.id = 'vizz';
+        canv.id = 'vizz' + this.id;
         canv.style.width = "100%";
         canv.style.height = "100vh";
         document.body.appendChild(canv);
         document.getElementById(this.id).appendChild(canv);
-        this.canvas = document.getElementById("vizz");
+        this.canvas = document.getElementById("vizz" + this.id);
         this.canvas.width = this.canvas.offsetWidth;
         this.canvas.height = this.canvas.offsetHeight;
         this.ctx = this.canvas.getContext("2d");
@@ -484,7 +484,6 @@ class Vizz {
      * @param {Array} color - цвета. 0 - предел для низкого значения, 1 - предел для среднего. 2 - предел самого громкого
      */
     mode_5(d, h, norm, ref, color) {
-
         if (h === undefined)
             h = 10;
         if (ref) {
@@ -499,6 +498,7 @@ class Vizz {
         }
         this.ctx.fillStyle = this.color;
         this.ctx.strokeStyle = this.color;
+        this.ctx.lineWidth = h;
         if (norm)
             d = this.data_norm(d, this.h);
 
